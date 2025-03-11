@@ -229,3 +229,151 @@ exports.getAverageAlcoholDegree = async (req, res) => {
     });
   }
 };
+
+exports.getAlcoholDegreeBetweenMinPriceAndMaxPrice = async (req, res) => {
+  const { id_bar } = req.params;
+  const { prix_min, prix_max } = req.query;
+
+  try {
+      const beers = await Biere.findAll({
+          where: {
+              barId: id_bar,
+              price: {
+                  [Sequelize.Op.between]: [prix_min, prix_max] // Filtrer par prix entre prix_min et prix_max
+              }
+          }
+      });
+
+      const averageDegree = beers.reduce((acc, beer) => acc + beer.degree, 0) / beers.length;
+      
+      res.json({ average_degree: averageDegree });
+  } catch (error) {
+      res.status(500).json({ message: 'Erreur lors du calcul du degré d\'alcool moyen' });
+  }
+};
+
+exports.getAlcoholDegreeOfBeersFromADate = async (req, res) => {
+  const { id_bar } = req.params;
+  const { date } = req.query;
+
+  try {
+      // Récupérer les commandes du bar à la date donnée
+      const commandes = await Commande.findAll({
+          where: {
+              barId: id_bar,
+              date: date
+          },
+          include: [
+              {
+                  model: Biere,
+                  through: { attributes: ['quantity'] } // Inclure les bières liées à la commande
+              }
+          ]
+      });
+
+      // Calculer le degré moyen en prenant les bières des commandes
+      const totalDegree = commandes.reduce((acc, commande) => {
+          return acc + commande.Bieres.reduce((acc, biere) => {
+              return acc + biere.degree;
+          }, 0);
+      }, 0);
+
+      const totalBeers = commandes.reduce((acc, commande) => {
+          return acc + commande.Bieres.length;
+      }, 0);
+
+      const averageDegree = totalDegree / totalBeers;
+
+      res.json({ average_degree: averageDegree });
+  } catch (error) {
+      res.status(500).json({ message: 'Erreur lors du calcul du degré d\'alcool moyen des commandes' });
+  }
+};
+
+exports.listBarOrdersFromDateAndBetweenMinPriceAndMaxPrice =  async (req, res) => {
+  const { id_bar } = req.params;
+  const { date, prix_min, prix_max } = req.query;
+
+  try {
+      const commandes = await Commande.findAll({
+          where: {
+              barId: id_bar,
+              date: date,
+              totalAmount: {
+                  [Sequelize.Op.between]: [prix_min, prix_max]
+              }
+          }
+      });
+      
+      res.json(commandes);
+  } catch (error) {
+      res.status(500).json({ message: 'Erreur lors de la récupération des commandes' });
+  }
+};
+
+exports.listBarOrdersFromDateAndBetweenMinPriceAndMaxPriceAndFinishStatus = async (req, res) => {
+  const { id_bar } = req.params;
+  const { date, prix_min, prix_max, status } = req.query;
+
+  try {
+      const commandes = await Commande.findAll({
+          where: {
+              barId: id_bar,
+              date: date,
+              totalAmount: {
+                  [Sequelize.Op.between]: [prix_min, prix_max]
+              },
+              status: status // Filtrer par le statut des commandes
+          }
+      });
+      
+      res.json(commandes);
+  } catch (error) {
+      res.status(500).json({ message: 'Erreur lors de la récupération des commandes' });
+  }
+};
+
+exports.listBarOrdersFromDateAndBetweenMinPriceAndMaxPriceAndFinishStatusAndExampleName = async (req, res) => {
+  const { id_bar } = req.params;
+  const { date, prix_min, prix_max, status, name } = req.query;
+
+  try {
+      const commandes = await Commande.findAll({
+          where: {
+              barId: id_bar,
+              date: date,
+              totalAmount: {
+                  [Sequelize.Op.between]: [prix_min, prix_max]
+              },
+              status: status,
+              customerName: {
+                  [Sequelize.Op.like]: `%${name}%` // Filtrer par le nom de client contenant 'example'
+              }
+          }
+      });
+      
+      res.json(commandes);
+  } catch (error) {
+      res.status(500).json({ message: 'Erreur lors de la récupération des commandes' });
+  }
+};
+
+exports.getAlphabeticSortedBeers = async (req, res) => {
+  const { id_bar } = req.params;
+  const { sort } = req.query; // 'asc' ou 'desc'
+
+  try {
+      const beers = await Biere.findAll({
+          where: {
+              barId: id_bar
+          },
+          order: [
+              ['name', sort === 'asc' ? 'ASC' : 'DESC'] // Trier par nom de bière en fonction de l'ordre demandé
+          ]
+      });
+
+      res.json(beers);
+  } catch (error) {
+      res.status(500).json({ message: 'Erreur lors de la récupération des bières' });
+  }
+};
