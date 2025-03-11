@@ -17,4 +17,7 @@ router.get('/bars/:id_bar/commandes', commandesController.getBarOrders);
 // GET /commandes/:id => Détail d'une commande d'un bar
 router.get('/commandes/:id', commandesController.getCommandeById);
 
+// Endpoint PDF
+router.get('/details/:id_commande', commandeController.getCommandeDetailsPdf);
+
 module.exports = router;
