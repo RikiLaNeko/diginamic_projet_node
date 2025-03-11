@@ -19,9 +19,9 @@ app.use('/commandes', commandeRouter);
 app.use('/biere_commande', biereCommandeRouter);
 
 sequelize.sync({ force: false }).then(() => {
-    console.log('Database & tables created!');
+    console.info('Base de donnée et table crée!');
     app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
+        console.info(`Le serveur a démarée sur le port: ${PORT}`);
     });
 }).catch(err => {
     console.error('Unable to connect to the database:', err);
