@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Bar = require('./bars');
+const Bars = require('./bars');
+const BiereCommande = require('./biere_commande');
 
 const Commande = sequelize.define('Commande', {
     name: {
@@ -17,19 +18,33 @@ const Commande = sequelize.define('Commande', {
     bars_id: {
         type: DataTypes.INTEGER,
         references: {
-            model: Bar,
+            model: Bars,
             key: 'id'
         }
     },
     date: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            isBefore: new Date().toISOString()
+        }
     },
     status: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            isIn: [['en cours', 'terminée']]
+            isIn: [['brouillon', 'en cours', 'terminée']]
+        }
+    }
+}, {
+    hooks: {
+        beforeUpdate: async (commande) => {
+            if (commande._previousDataValues.status === 'terminée') {
+                throw new Error('Une commande terminée ne peut pas être modifiée');
+            }
+        },
+        beforeDestroy: async (commande) => {
+            await BiereCommande.destroy({ where: { commande_id: commande.id } });
         }
     }
 });

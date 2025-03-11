@@ -1,5 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const Biere = require('./biere');
+const Commande = require('./commande');
 
 const Bars = sequelize.define('Bars', {
     id: {
@@ -27,6 +29,13 @@ const Bars = sequelize.define('Bars', {
     description: {
         type: DataTypes.TEXT,
         allowNull: true
+    }
+}, {
+    hooks: {
+        beforeDestroy: async (bar) => {
+            await Biere.destroy({ where: { bars_id: bar.id } });
+            await Commande.destroy({ where: { bars_id: bar.id } });
+        }
     }
 });
 
