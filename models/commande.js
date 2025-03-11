@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Bars = require('./bars');
-const BiereCommande = require('./biere_commande');
 
 const Commande = sequelize.define('Commande', {
     name: {
@@ -44,7 +43,7 @@ const Commande = sequelize.define('Commande', {
             }
         },
         beforeDestroy: async (commande) => {
-            await BiereCommande.destroy({ where: { commande_id: commande.id } });
+            await  Commande.destroy({ where: { commande_id: commande.id } });
         }
     }
 });

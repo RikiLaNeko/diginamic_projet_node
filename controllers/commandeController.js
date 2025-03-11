@@ -1,16 +1,18 @@
 const Commande = require('../models/commande');
-const PDFDocument = require('pdfkit'); // <-- import de pdfkit pour la méthode PDF
+const PDFDocument = require('pdfkit');
 
 // Ajouter une commande à un bar
 exports.addCommandeToBar = async (req, res) => {
   try {
     const { id_bar } = req.params;
-    const { items, totalPrice } = req.body;
+    const { name, prix, date, status } = req.body;
 
     const newCommande = await Commande.create({
-      barId: id_bar,
-      items,
-      totalPrice,
+      name,
+      prix,
+      date: date || new Date(),
+      status: status || 'brouillon',
+      bars_id: id_bar
     });
 
     return res.status(201).json({
@@ -18,9 +20,9 @@ exports.addCommandeToBar = async (req, res) => {
       commande: newCommande,
     });
   } catch (error) {
-    console.error('Erreur lors de l’ajout de la commande :', error);
+    console.error('Erreur lors de l\'ajout de la commande:', error);
     return res.status(500).json({
-      message: 'Une erreur est survenue lors de l’ajout de la commande.',
+      message: 'Une erreur est survenue lors de l\'ajout de la commande.',
       error: error.message,
     });
   }
@@ -30,15 +32,18 @@ exports.addCommandeToBar = async (req, res) => {
 exports.updateCommande = async (req, res) => {
   try {
     const { id_commande } = req.params;
-    const { items, totalPrice } = req.body;
+    const { name, prix, date, status } = req.body;
 
     const commande = await Commande.findByPk(id_commande);
     if (!commande) {
       return res.status(404).json({ message: 'Commande introuvable.' });
     }
 
-    commande.items = items || commande.items;
-    commande.totalPrice = totalPrice || commande.totalPrice;
+    // Hook in model will prevent updating if status is 'terminée'
+    commande.name = name || commande.name;
+    commande.prix = prix !== undefined ? prix : commande.prix;
+    commande.date = date || commande.date;
+    commande.status = status || commande.status;
 
     await commande.save();
 
@@ -47,7 +52,7 @@ exports.updateCommande = async (req, res) => {
       commande,
     });
   } catch (error) {
-    console.error('Erreur lors de la mise à jour de la commande :', error);
+    console.error('Erreur lors de la mise à jour de la commande:', error);
     return res.status(500).json({
       message: 'Une erreur est survenue lors de la mise à jour de la commande.',
       error: error.message,
@@ -71,7 +76,7 @@ exports.deleteCommande = async (req, res) => {
       message: 'Commande supprimée avec succès.',
     });
   } catch (error) {
-    console.error('Erreur lors de la suppression de la commande :', error);
+    console.error('Erreur lors de la suppression de la commande:', error);
     return res.status(500).json({
       message: 'Une erreur est survenue lors de la suppression de la commande.',
       error: error.message,
@@ -79,20 +84,44 @@ exports.deleteCommande = async (req, res) => {
   }
 };
 
+
 // Liste des commandes d'un bar
 exports.getBarOrders = async (req, res) => {
   try {
     const { id_bar } = req.params;
+    const { date, prix_min, prix_max, status, name } = req.query;
+
+    const whereClause = { bars_id: id_bar };
+
+    if (date) {
+      whereClause.date = new Date(date);
+    }
+
+    if (prix_min && prix_max) {
+      whereClause.prix = { [Op.between]: [parseFloat(prix_min), parseFloat(prix_max)] };
+    } else if (prix_min) {
+      whereClause.prix = { [Op.gte]: parseFloat(prix_min) };
+    } else if (prix_max) {
+      whereClause.prix = { [Op.lte]: parseFloat(prix_max) };
+    }
+
+    if (status) {
+      whereClause.status = status;
+    }
+
+    if (name) {
+      whereClause.name = { [Op.like]: `%${name}%` };
+    }
 
     const commandes = await Commande.findAll({
-      where: { barId: id_bar },
+      where: whereClause
     });
 
     return res.status(200).json(commandes);
   } catch (error) {
-    console.error('Erreur lors de la récupération des commandes du bar :', error);
+    console.error('Erreur lors de la récupération des commandes:', error);
     return res.status(500).json({
-      message: 'Une erreur est survenue lors de la récupération des commandes du bar.',
+      message: 'Une erreur est survenue lors de la récupération des commandes.',
       error: error.message,
     });
   }
@@ -101,16 +130,16 @@ exports.getBarOrders = async (req, res) => {
 // Détail d'une commande d'un bar
 exports.getCommandeById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id_commande } = req.params;
 
-    const commande = await Commande.findByPk(id);
+    const commande = await Commande.findByPk(id_commande);
     if (!commande) {
       return res.status(404).json({ message: 'Commande introuvable.' });
     }
 
     return res.status(200).json(commande);
   } catch (error) {
-    console.error('Erreur lors de la récupération de la commande :', error);
+    console.error('Erreur lors de la récupération de la commande:', error);
     return res.status(500).json({
       message: 'Une erreur est survenue lors de la récupération de la commande.',
       error: error.message,
@@ -118,48 +147,29 @@ exports.getCommandeById = async (req, res) => {
   }
 };
 
-/**
- * Générer un PDF contenant les détails d'une commande
- * GET /commande/details/:id_commande
- *
- * Cette méthode utilise la librairie pdfkit pour créer un PDF
- * et l'envoyer dans la réponse.
- */
 exports.getCommandeDetailsPdf = async (req, res) => {
   try {
     const { id_commande } = req.params;
 
-    // Récupérer la commande par son ID
     const commande = await Commande.findByPk(id_commande);
     if (!commande) {
       return res.status(404).json({ message: 'Commande introuvable.' });
     }
 
-    // Création du document PDF
     const doc = new PDFDocument();
-
-    // Définir le header comme PDF
     res.setHeader('Content-Type', 'application/pdf');
-    // Optionnel : pour forcer le téléchargement, on peut faire :
-    // res.setHeader('Content-Disposition', 'attachment; filename="commande.pdf"');
-
-    // Pipe le flux du PDF vers la réponse
     doc.pipe(res);
 
-    // Contenu du PDF (personnalise selon tes champs)
     doc.fontSize(18).text(`Détails de la commande #${commande.id}`, { underline: true });
     doc.moveDown();
-    // Par exemple, on peut afficher "items" et "totalPrice" si le modèle contient ces champs
-    doc.fontSize(14).text(`Items : ${commande.items}`);
-    doc.text(`Total Price : ${commande.totalPrice}`);
-    
-    // Si tu as un champ "createdAt" ou "date", tu peux l'afficher ici :
-    // doc.text(`Date : ${commande.createdAt}`);
+    doc.fontSize(14).text(`Nom : ${commande.name}`);
+    doc.text(`Prix : ${commande.prix} €`);
+    doc.text(`Date : ${commande.date.toLocaleDateString()}`);
+    doc.text(`Statut : ${commande.status}`);
 
     doc.moveDown();
     doc.fontSize(12).text('Merci pour votre commande !', { align: 'center' });
 
-    // Finaliser le PDF
     doc.end();
   } catch (error) {
     console.error('Erreur lors de la génération du PDF :', error);

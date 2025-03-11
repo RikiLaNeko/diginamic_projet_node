@@ -16,6 +16,50 @@
 const { Commande, Biere, BiereCommande } = require('../models/models');
 
 /**
+ * Récupérer toutes les bières d'une commande.
+ * GET /commandes/:id_commande/biere
+ *
+ * @param {Object} req - Requête Express.
+ * @param {Object} res - Réponse Express.
+ * @returns {Object} - JSON contenant les bières de la commande.
+ */
+exports.getBieresFromCommande = async (req, res) => {
+  try {
+    const { id_commande } = req.params;
+
+    // Vérifier que la commande existe
+    const commande = await Commande.findByPk(id_commande);
+    if (!commande) {
+      return res.status(404).json({ message: 'Commande introuvable.' });
+    }
+
+    // Récupérer la commande avec ses bières associées
+    const commandeWithBieres = await Commande.findByPk(id_commande, {
+      include: [{
+        model: Biere,
+        through: {
+          model: BiereCommande,
+          attributes: ['quantity']
+        }
+      }]
+    });
+
+    if (!commandeWithBieres.Bieres) {
+      return res.status(200).json([]);
+    }
+
+    return res.status(200).json(commandeWithBieres.Bieres);
+  } catch (error) {
+    console.error('Erreur dans getBieresFromCommande:', error);
+    return res.status(500).json({
+      message: "Erreur lors de la récupération des bières de la commande.",
+      error: error.message,
+    });
+  }
+};
+
+
+/**
  * Ajouter une bière à une commande.
  * POST /commandes/:id_commande/biere/:id_biere
  *

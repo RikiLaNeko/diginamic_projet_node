@@ -12,13 +12,16 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use('/', routers);
 
-sequelize.sync({ force: false }).then(() => {
-    console.info('Base de donnée et table crée!');
-    app.listen(PORT, () => {
-        console.info(`Le serveur a démarée sur le port: ${PORT}`);
+
+if (process.env.NODE_ENV !== 'test') {
+    sequelize.sync({ force: false }).then(() => {
+        console.info('Base de donnée et table crée!');
+        app.listen(PORT, () => {
+            console.info(`Le serveur a démarée sur le port: ${PORT}`);
+        });
+    }).catch(err => {
+        console.error('Unable to connect to the database:', err);
     });
-}).catch(err => {
-    console.error('Unable to connect to the database:', err);
-});
+}
 
 module.exports = app;

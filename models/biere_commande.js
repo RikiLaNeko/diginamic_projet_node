@@ -9,14 +9,20 @@ const BiereCommande = sequelize.define('BiereCommande', {
         references: {
             model: Biere,
             key: 'id'
-        }
+        },
+        primaryKey: true
     },
     commande_id: {
         type: DataTypes.INTEGER,
         references: {
             model: Commande,
             key: 'id'
-        }
+        },
+        primaryKey: true
+    },
+    quantity: {
+        type: DataTypes.INTEGER,
+        defaultValue: 1
     }
 });
 

@@ -1,28 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const biereCommandeController = require('../controllers/biere_commandeController');
 
-// Exemple de modèle Sequelize pour la relation BiereCommande
-const BiereCommande = require('../models/biere_commande');
+router.get('/commandes/:id_commande/biere', biereCommandeController.getBieresFromCommande);
 
-// Récupérer toutes les bières d'une commande spécifique
-router.get('/:commandeId', async (req, res) => {
-    try {
-        const biereCommandes = await BiereCommande.findAll({ where: { commandeId: req.params.commandeId } });
-        res.json(biereCommandes);
-    } catch (error) {
-        res.status(500).json({ message: 'Erreur lors de la récupération des bières de la commande' });
-    }
-});
+// POST /commandes/:id_commande/biere/:id_biere => Ajouter une bière à une commande
+router.post('/commandes/:id_commande/biere/:id_biere', biereCommandeController.addBiereToCommande);
 
-// Ajouter une bière à une commande
-router.post('/', async (req, res) => {
-    try {
-        const { commandeId, biereId, quantity } = req.body;
-        const newBiereCommande = await BiereCommande.create({ commandeId, biereId, quantity });
-        res.status(201).json(newBiereCommande);
-    } catch (error) {
-        res.status(500).json({ message: 'Erreur lors de l\'ajout de la bière à la commande' });
-    }
-});
+// DELETE /commandes/:id_commande/biere/:id_biere => Supprimer une bière d'une commande
+router.delete('/commandes/:id_commande/biere/:id_biere', biereCommandeController.deleteBiereFromCommande);
 
 module.exports = router;

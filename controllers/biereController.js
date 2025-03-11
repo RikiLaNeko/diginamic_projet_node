@@ -23,7 +23,7 @@ const { Biere, Bars } = require('../models/models');
 exports.addBiereToBar = async (req, res) => {
   try {
     const { id_bar } = req.params;
-    const { name, style, alcoholContent } = req.body;
+    const { name, description, degree, prix } = req.body;
 
     // Vérifier que le bar existe
     const bar = await Bars.findByPk(id_bar);
@@ -34,9 +34,10 @@ exports.addBiereToBar = async (req, res) => {
     // Créer une nouvelle bière associée au bar
     const newBiere = await Biere.create({
       name,
-      style,
-      alcoholContent,
-      barId: id_bar, // Assurez-vous que votre modèle Biere possède bien "barId" comme clé étrangère
+      description,
+      degree,
+      prix,
+      bars_id: id_bar, // Utiliser bars_id au lieu de barId
     });
 
     return res.status(201).json({
@@ -44,9 +45,9 @@ exports.addBiereToBar = async (req, res) => {
       biere: newBiere,
     });
   } catch (error) {
-    console.error('Erreur lors de l’ajout de la bière :', error);
+    console.error('Erreur lors de l\'ajout de la bière :', error);
     return res.status(500).json({
-      message: 'Une erreur est survenue lors de l’ajout de la bière.',
+      message: 'Une erreur est survenue lors de l\'ajout de la bière.',
       error: error.message,
     });
   }
@@ -151,7 +152,7 @@ exports.getBiereListByBar = async (req, res) => {
     }
 
     // Construire la clause WHERE
-    const whereClause = { barId: id_bar };
+    const whereClause = { bars_id: id_bar };
 
     // Filtre sur le degré d'alcool
     if (degree_min !== undefined && degree_max !== undefined) {
