@@ -1,17 +1,5 @@
-/**
- * barsController.js
- * 
- * Ce contrôleur gère toutes les opérations CRUD liées aux bars.
- * 
- * Endpoints gérés :
- *  - POST /bars         => createBar
- *  - PUT /bars/:id_bar  => updateBar
- *  - DELETE /bars/:id_bar => deleteBar
- *  - GET /bars          => getAllBars
- *  - GET /bars/:id_bar  => getBarById
- */
-
-const { Bars } = require('../models/models');
+const { Bars, Orders, Beers } = require('../models/models');
+const { Op } = require('sequelize');
 
 /**
  * Créer un nouveau bar
@@ -150,6 +138,93 @@ exports.getBarById = async (req, res) => {
     console.error('Erreur lors de la récupération du bar :', error);
     return res.status(500).json({
       message: 'Une erreur est survenue lors de la récupération du bar.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Récupérer les commandes d'un bar à une date donnée ou avec un prix compris entre deux valeurs
+ * @param {Object} req - Objet requête Express
+ * @param {Object} res - Objet réponse Express
+ * @returns {Array} - Tableau contenant les commandes
+ */
+exports.getBarOrders = async (req, res) => {
+  try {
+    const { id_bar } = req.params;
+    const { date, prix_min, prix_max } = req.query;
+    const whereClause = { barId: id_bar };
+
+    if (date) {
+      whereClause.date = date;
+    }
+    if (prix_min && prix_max) {
+      whereClause.price = { [Op.between]: [prix_min, prix_max] };
+    }
+
+    const orders = await Orders.findAll({ where: whereClause });
+    return res.status(200).json(orders);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des commandes :', error);
+    return res.status(500).json({
+      message: 'Une erreur est survenue lors de la récupération des commandes.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Récupérer les bars par ville ou par nom
+ * @param {Object} req - Objet requête Express
+ * @param {Object} res - Objet réponse Express
+ * @returns {Array} - Tableau contenant les bars
+ */
+exports.getBarsByQuery = async (req, res) => {
+  try {
+    const { ville, name } = req.query;
+    const whereClause = {};
+
+    if (ville) {
+      whereClause.city = ville;
+    }
+    if (name) {
+      whereClause.name = { [Op.like]: `%${name}%` };
+    }
+
+    const bars = await Bars.findAll({ where: whereClause });
+    return res.status(200).json(bars);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des bars :', error);
+    return res.status(500).json({
+      message: 'Une erreur est survenue lors de la récupération des bars.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Récupérer le degré d'alcool moyen des bières d'un bar
+ * @param {Object} req - Objet requête Express
+ * @param {Object} res - Objet réponse Express
+ * @returns {Object} - Retourne le degré d'alcool moyen
+ */
+exports.getAverageAlcoholDegree = async (req, res) => {
+  try {
+    const { id_bar } = req.params;
+
+    const beers = await Beers.findAll({ where: { barId: id_bar } });
+    if (beers.length === 0) {
+      return res.status(404).json({ message: 'Aucune bière trouvée pour ce bar.' });
+    }
+
+    const totalDegree = beers.reduce((sum, beer) => sum + beer.alcoholDegree, 0);
+    const averageDegree = totalDegree / beers.length;
+
+    return res.status(200).json({ averageAlcoholDegree: averageDegree });
+  } catch (error) {
+    console.error('Erreur lors de la récupération du degré d\'alcool moyen :', error);
+    return res.status(500).json({
+      message: 'Une erreur est survenue lors de la récupération du degré d\'alcool moyen.',
       error: error.message,
     });
   }
