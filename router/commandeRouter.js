@@ -18,6 +18,6 @@ router.get('/bars/:id_bar/commandes', commandesController.getBarOrders);
 router.get('/commandes/:id', commandesController.getCommandeById);
 
 // Endpoint PDF
-router.get('/details/:id_commande', commandeController.getCommandeDetailsPdf);
+router.get('/details/:id_commande', commandesController.getCommandeDetailsPdf);
 
 module.exports = router;
