@@ -1,28 +1,20 @@
 const express = require('express');
 const router = express.Router();
+const commandesController = require('../controllers/commandeController');
 
-// Exemple de modèle Sequelize pour 'Commande'
-const Commande = require('../models/commande');
+// POST /bars/:id_bar/commandes => Ajouter une commande à un bar
+router.post('/bars/:id_bar/commandes', commandesController.addCommandeToBar);
 
-// Récupérer toutes les commandes
-router.get('/', async (req, res) => {
-    try {
-        const commandes = await Commande.findAll();
-        res.json(commandes);
-    } catch (error) {
-        res.status(500).json({ message: 'Erreur lors de la récupération des commandes' });
-    }
-});
+// PUT /commandes/:id_commande => Modifier une commande d'un bar
+router.put('/commandes/:id_commande', commandesController.updateCommande);
 
-// Créer une nouvelle commande
-router.post('/', async (req, res) => {
-    try {
-        const { customerName, totalAmount } = req.body;
-        const newCommande = await Commande.create({ customerName, totalAmount });
-        res.status(201).json(newCommande);
-    } catch (error) {
-        res.status(500).json({ message: 'Erreur lors de la création de la commande' });
-    }
-});
+// DELETE /commandes/:id_commande => Supprimer une commande d'un bar
+router.delete('/commandes/:id_commande', commandesController.deleteCommande);
+
+// GET /bars/:id_bar/commandes => Liste des commandes d'un bar
+router.get('/bars/:id_bar/commandes', commandesController.getBarOrders);
+
+// GET /commandes/:id => Détail d'une commande d'un bar
+router.get('/commandes/:id', commandesController.getCommandeById);
 
 module.exports = router;
