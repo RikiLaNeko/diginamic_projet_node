@@ -28,13 +28,13 @@ exports.addBiereToCommande = async (req, res) => {
     const { id_commande, id_biere } = req.params;
     const { quantity = 1 } = req.body; // Quantité par défaut à 1
 
-    // Vérifier que la commande existe.
+    // on vérifier que la commande existe.
     const commande = await Commande.findByPk(id_commande);
     if (!commande) {
       return res.status(404).json({ message: 'Commande introuvable.' });
     }
 
-    // Vérifier que la bière existe.
+    // on vérifie que la bière existe.
     const biere = await Biere.findByPk(id_biere);
     if (!biere) {
       return res.status(404).json({ message: 'Bière introuvable.' });
