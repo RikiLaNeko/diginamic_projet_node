@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // Exemple de modèle Sequelize pour 'Commande'
-const Commande = require('../models/Commande');
+const Commande = require('../models/commande');
 
 // Récupérer toutes les commandes
 router.get('/', async (req, res) => {

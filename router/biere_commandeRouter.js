@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // Exemple de modèle Sequelize pour la relation BiereCommande
-const BiereCommande = require('../models/BiereCommande');
+const BiereCommande = require('../models/biere_commande');
 
 // Récupérer toutes les bières d'une commande spécifique
 router.get('/:commandeId', async (req, res) => {

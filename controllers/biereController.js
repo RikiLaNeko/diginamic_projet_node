@@ -11,7 +11,8 @@
  *  - GET /biere/:id_biere        => Détail d'une bière
  */
 
-const { Biere, Bar } = require('../models');
+const { Biere, Bars } = require('../models/models');
+
 
 /**
  * Ajouter une bière à un bar
@@ -25,7 +26,7 @@ exports.addBiereToBar = async (req, res) => {
     const { name, style, alcoholContent } = req.body;
 
     // Vérifier que le bar existe
-    const bar = await Bar.findByPk(id_bar);
+    const bar = await Bars.findByPk(id_bar);
     if (!bar) {
       return res.status(404).json({ message: 'Bar introuvable.' });
     }
@@ -129,7 +130,7 @@ exports.getBiereListByBar = async (req, res) => {
     const { id_bar } = req.params;
 
     // Vérifier que le bar existe
-    const bar = await Bar.findByPk(id_bar);
+    const bar = await Bars.findByPk(id_bar);
     if (!bar) {
       return res.status(404).json({ message: 'Bar introuvable.' });
     }

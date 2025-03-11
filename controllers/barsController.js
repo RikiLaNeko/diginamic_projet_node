@@ -11,7 +11,7 @@
  *  - GET /bars/:id_bar  => getBarById
  */
 
-const { Bar } = require('../models');
+const { Bars } = require('../models/models');
 
 /**
  * Créer un nouveau bar
@@ -21,13 +21,13 @@ const { Bar } = require('../models');
  */
 exports.createBar = async (req, res) => {
   try {
-    const { name, address, city } = req.body;
+    const { name, address, email } = req.body;
 
     // Création d'un bar dans la base de données
-    const newBar = await Bar.create({
+    const newBar = await Bars.create({
       name,
       address,
-      city,
+      email,
     });
 
     return res.status(201).json({
@@ -55,7 +55,7 @@ exports.updateBar = async (req, res) => {
     const { name, address, city } = req.body;
 
     // Recherche du bar par son ID
-    const bar = await Bar.findByPk(id_bar);
+    const bar = await Bars.findByPk(id_bar);
     if (!bar) {
       return res.status(404).json({ message: 'Bar introuvable.' });
     }
@@ -91,7 +91,7 @@ exports.deleteBar = async (req, res) => {
     const { id_bar } = req.params;
 
     // Recherche du bar par son ID
-    const bar = await Bar.findByPk(id_bar);
+    const bar = await Bars.findByPk(id_bar);
     if (!bar) {
       return res.status(404).json({ message: 'Bar introuvable.' });
     }
@@ -118,7 +118,7 @@ exports.deleteBar = async (req, res) => {
  */
 exports.getAllBars = async (req, res) => {
   try {
-    const bars = await Bar.findAll();
+    const bars = await Bars.findAll();
     return res.status(200).json(bars);
   } catch (error) {
     console.error('Erreur lors de la récupération des bars :', error);
@@ -140,7 +140,7 @@ exports.getBarById = async (req, res) => {
     const { id_bar } = req.params;
 
     // Recherche du bar par son ID
-    const bar = await Bar.findByPk(id_bar);
+    const bar = await Bars.findByPk(id_bar);
     if (!bar) {
       return res.status(404).json({ message: 'Bar introuvable.' });
     }
