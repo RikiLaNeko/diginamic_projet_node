@@ -29,7 +29,16 @@ const Bars = sequelize.define('Bars', {
     description: {
         type: DataTypes.TEXT,
         allowNull: true
-    }
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    token: {
+        type: DataTypes.STRING,
+        allowNull: true
+    }    
+
 }, {
     hooks: {
         beforeDestroy: async (bar) => {

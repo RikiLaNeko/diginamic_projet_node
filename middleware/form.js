@@ -5,7 +5,8 @@ const validateBar = [
     body('adresse').isString().notEmpty().withMessage('L\'adresse du bar est obligatoire et doit être une chaîne de caractères.'),
     body('email').isEmail().withMessage('L\'email doit être valide.'),
     body('tel').optional().isString().withMessage('Le téléphone doit être une chaîne de caractères.'),
-    body('description').optional().isString().withMessage('La description doit être une chaîne de caractères.')
+    body('description').optional().isString().withMessage('La description doit être une chaîne de caractères.'),
+    body('password').isString().notEmpty().withMessage('Le mot de passe est obligatoire et doit être une chaîne de caractères.')
 ];
 
 const validateBiere = [

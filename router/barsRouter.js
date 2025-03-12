@@ -3,6 +3,7 @@ const router = express.Router();
 const barsController = require('../controllers/barsController');
 const biereController = require('../controllers/biereController');
 const commandeController = require('../controllers/commandeController');
+const auth = require('../middleware/auth');
 
 // GET /bars => Liste des bars
 router.get('/', barsController.getAllBars);
@@ -11,28 +12,28 @@ router.get('/', barsController.getAllBars);
 router.get('/', barsController.getBarsByQuery);
 
 // POST /bars => Ajouter un bar
-router.post('/', barsController.createBar);
+router.post('/', auth , barsController.createBar);
 
 // GET /bars/:id_bar => Détail d'un bar
 router.get('/:id_bar', barsController.getBarById);
 
 // PUT /bars/:id_bar => Modifier un bar
-router.put('/:id_bar', barsController.updateBar);
+router.put('/:id_bar', auth , barsController.updateBar);
 
 // DELETE /bars/:id_bar => Supprimer un bar
-router.delete('/:id_bar', barsController.deleteBar);
+router.delete('/:id_bar', auth , barsController.deleteBar);
 
 // Toutes les routes liées au degré d'alcool
 router.get('/:id_bar/degree', barsController.getAverageAlcoholDegree);
 
 // POST /bars/:id_bar/biere => Ajouter une bière à un bar
-router.post('/:id_bar/biere', biereController.addBiereToBar);
+router.post('/:id_bar/biere', auth , biereController.addBiereToBar);
 
 // GET /bars/:id_bar/biere => Liste des bières d'un bar (avec tous les filtres)
 router.get('/:id_bar/biere', biereController.getBiereListByBar);
 
 // POST /bars/:id_bar/commandes => Ajouter une commande
-router.post('/:id_bar/commandes', commandeController.addCommandeToBar);
+router.post('/:id_bar/commandes', auth , commandeController.addCommandeToBar);
 
 // GET /bars/:id_bar/commandes => Liste des commandes (avec tous les filtres)
 router.get('/:id_bar/commandes', commandeController.getBarOrders);

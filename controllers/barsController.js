@@ -1,5 +1,10 @@
 const { Bars, Commande, Biere } = require('../models/models');
 const { Op } = require('sequelize');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { ne } = require('@faker-js/faker');
+
+const JWT_SECRET = process.env.JWT_SECRET; 
 
 /**
  * Créer un nouveau bar
@@ -9,7 +14,16 @@ const { Op } = require('sequelize');
  */
 exports.createBar = async (req, res) => {
     try {
-        const { name, adresse, email, tel, description } = req.body;
+        const { name, adresse, email, tel, description, password } = req.body;
+
+        // Vérifie si l'email est déjà utilisé
+        const existingBar = await Bars.findOne({ where: { email } });
+        if (existingBar) {
+            return res.status(400).json({ message: 'Un bar existe déjà avec cet email.' });
+        }
+
+        // Hash du mot de passe
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Création d'un bar dans la base de données
         const newBar = await Bars.create({
@@ -17,12 +31,24 @@ exports.createBar = async (req, res) => {
             adresse,
             email,
             tel,
-            description
+            description,
+            password: hashedPassword,
         });
 
+        // Génération du token JWT (valable 2h)
+        const token = jwt.sign({ id: newBar.id }, JWT_SECRET, { expiresIn: '2h' });
+
+        newBar.token = token;
+        await newBar.save();
+
         return res.status(201).json({
-            message: 'Bar créé avec succès.',
-            bar: newBar,
+            id: newBar.id,
+            name: newBar.name,
+            adresse: newBar.adresse,
+            email: newBar.email,
+            tel: newBar.tel,
+            description: newBar.description,
+            token
         });
     } catch (error) {
         console.error('Erreur lors de la création du bar :', error);
@@ -30,6 +56,51 @@ exports.createBar = async (req, res) => {
             message: 'Une erreur est survenue lors de la création du bar.',
             error: error.message,
         });
+    }
+};
+
+/**
+ * Connexion d'un bar
+ * @param {Object} req - Objet requête Express
+ * @param {Object} res - Objet réponse Express
+ * @returns {Object} - Retourne les informations du bar connecté avec le token
+ */
+exports.login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Recherche du bar par email
+        const bar = await Bars.findOne({ where: { email } });
+        if (!bar) {
+            return res.status(400).json({ message: "Identifiants invalides" });
+        }
+
+        // Vérifie le mot de passe
+        const isMatch = await bcrypt.compare(password, bar.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Identifiants invalides" });
+        }
+
+        // Génère un nouveau token JWT (valable 2h)
+        const token = jwt.sign(
+            { bar_id: bar.id, email: bar.email },
+            JWT_SECRET,
+            { expiresIn: "2h" }
+        );
+
+        // Met à jour le token en base
+        bar.token = token;
+        await bar.save();
+
+        return res.status(200).json({
+            id: bar.id,
+            name: bar.name,
+            email: bar.email,
+            token: bar.token
+        });
+    } catch (err) {
+        console.error("Erreur lors de la connexion :", err);
+        return res.status(500).json({ message: "Erreur lors de la connexion" });
     }
 };
 
