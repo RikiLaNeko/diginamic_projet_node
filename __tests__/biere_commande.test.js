@@ -1,15 +1,12 @@
 const request = require('supertest');
 const { faker } = require('@faker-js/faker');
 const app = require('../index');
-const sequelize = require('../config/database');
 const { Bars, Biere, Commande, BiereCommande } = require('../models/models');
 
 describe('Biere-Commande API', () => {
   let testBar, testBiere, testCommande;
 
   beforeAll(async () => {
-    await sequelize.sync({ force: true });
-
     // Create test data
     testBar = await Bars.create({
       name: faker.company.name(),
@@ -29,14 +26,12 @@ describe('Biere-Commande API', () => {
       name: `Order ${faker.string.uuid()}`,
       prix: 25.50,
       bars_id: testBar.id,
-      date: new Date().toISOString(), // Ensure the date is in ISO format
+      date: new Date(Date.now() - 24 * 60 * 60 * 1000),
       status: 'en cours'
     });
   });
 
-  afterAll(async () => {
-    await sequelize.close();
-  });
+  // No sequelize.close() needed
 
   describe('POST /commandes/:id_commande/biere/:id_biere', () => {
     it('should add a beer to an order', async () => {
@@ -55,7 +50,6 @@ describe('Biere-Commande API', () => {
 
   describe('GET /commandes/:id_commande/biere', () => {
     it('should get all beers for a specific order', async () => {
-      // Don't create another association - already done in previous test
 
       const response = await request(app)
           .get(`/biere_commande/commandes/${testCommande.id}/biere`)

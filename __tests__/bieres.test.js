@@ -1,24 +1,17 @@
 const request = require('supertest');
 const { faker } = require('@faker-js/faker');
 const app = require('../index');
-const sequelize = require('../config/database');
 const { Bars, Biere } = require('../models/models');
 
 describe('Bieres API', () => {
   let testBar;
 
   beforeAll(async () => {
-    await sequelize.sync({ force: true });
-    // Create a test bar for beer-related tests
     testBar = await Bars.create({
       name: faker.company.name(),
       adresse: faker.location.streetAddress(),
       email: faker.internet.email()
     });
-  });
-
-  afterAll(async () => {
-    await sequelize.close();
   });
 
   describe('POST /bars/:id_bar/biere', () => {
@@ -31,9 +24,9 @@ describe('Bieres API', () => {
       };
 
       const response = await request(app)
-        .post(`/bars/${testBar.id}/biere`)
-        .send(biereData)
-        .expect(201);
+          .post(`/bars/${testBar.id}/biere`)
+          .send(biereData)
+          .expect(201);
 
       expect(response.body).toHaveProperty('message', 'Bière ajoutée avec succès au bar.');
       expect(response.body.biere).toHaveProperty('name', biereData.name);
@@ -52,8 +45,8 @@ describe('Bieres API', () => {
       });
 
       const response = await request(app)
-        .get(`/bars/${testBar.id}/biere`)
-        .expect(200);
+          .get(`/bars/${testBar.id}/biere`)
+          .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
     });
@@ -75,8 +68,8 @@ describe('Bieres API', () => {
       });
 
       const response = await request(app)
-        .get(`/bars/${testBar.id}/biere?prix_min=8&prix_max=10`)
-        .expect(200);
+          .get(`/bars/${testBar.id}/biere?prix_min=8&prix_max=10`)
+          .expect(200);
 
       expect(response.body.length).toBeGreaterThanOrEqual(1);
       expect(response.body[0]).toHaveProperty('name', 'Expensive Beer');
@@ -99,9 +92,9 @@ describe('Bieres API', () => {
       };
 
       const response = await request(app)
-        .put(`/biere/${biere.id}`)
-        .send(updateData)
-        .expect(200);
+          .put(`/biere/${biere.id}`)
+          .send(updateData)
+          .expect(200);
 
       expect(response.body.biere).toHaveProperty('name', updateData.name);
     });
@@ -118,8 +111,8 @@ describe('Bieres API', () => {
       });
 
       await request(app)
-        .delete(`/biere/${biere.id}`)
-        .expect(200);
+          .delete(`/biere/${biere.id}`)
+          .expect(200);
 
       // Verify the beer is deleted
       const deletedBiere = await Biere.findByPk(biere.id);

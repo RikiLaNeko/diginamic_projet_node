@@ -1,17 +1,9 @@
 const request = require('supertest');
 const { faker } = require('@faker-js/faker');
 const app = require('../index');
-const sequelize = require('../config/database');
 const { Bars } = require('../models/models');
 
 describe('Bars API', () => {
-  beforeAll(async () => {
-    await sequelize.sync({ force: true });
-  });
-
-  afterAll(async () => {
-    await sequelize.close();
-  });
 
   describe('POST /bars', () => {
     it('should create a new bar', async () => {
@@ -24,9 +16,9 @@ describe('Bars API', () => {
       };
 
       const response = await request(app)
-        .post('/bars')
-        .send(barData)
-        .expect(201);
+          .post('/bars')
+          .send(barData)
+          .expect(201);
 
       expect(response.body).toHaveProperty('message', 'Bar créé avec succès.');
       expect(response.body.bar).toHaveProperty('name', barData.name);
@@ -36,8 +28,8 @@ describe('Bars API', () => {
   describe('GET /bars', () => {
     it('should retrieve all bars', async () => {
       const response = await request(app)
-        .get('/bars')
-        .expect(200);
+          .get('/bars')
+          .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
     });
@@ -53,16 +45,16 @@ describe('Bars API', () => {
       });
 
       const response = await request(app)
-        .get(`/bars/${bar.id}`)
-        .expect(200);
+          .get(`/bars/${bar.id}`)
+          .expect(200);
 
       expect(response.body).toHaveProperty('id', bar.id);
     });
 
     it('should return 404 for non-existent bar', async () => {
       await request(app)
-        .get('/bars/9999')
-        .expect(404);
+          .get('/bars/9999')
+          .expect(404);
     });
   });
 
@@ -80,9 +72,9 @@ describe('Bars API', () => {
       };
 
       const response = await request(app)
-        .put(`/bars/${bar.id}`)
-        .send(updateData)
-        .expect(200);
+          .put(`/bars/${bar.id}`)
+          .send(updateData)
+          .expect(200);
 
       expect(response.body.bar).toHaveProperty('name', updateData.name);
     });
@@ -97,8 +89,8 @@ describe('Bars API', () => {
       });
 
       await request(app)
-        .delete(`/bars/${bar.id}`)
-        .expect(200);
+          .delete(`/bars/${bar.id}`)
+          .expect(200);
 
       // Verify the bar is deleted
       const deletedBar = await Bars.findByPk(bar.id);

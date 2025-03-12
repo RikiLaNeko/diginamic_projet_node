@@ -3,6 +3,11 @@ const sequelize = require('../config/database');
 const Bars = require('./bars');
 
 const Commande = sequelize.define('Commande', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
     name: {
         type: DataTypes.STRING,
         allowNull: false
@@ -43,7 +48,7 @@ const Commande = sequelize.define('Commande', {
             }
         },
         beforeDestroy: async (commande) => {
-            await  Commande.destroy({ where: { commande_id: commande.id } });
+            await Commande.destroy({ where: { id: commande.id } });
         }
     }
 });

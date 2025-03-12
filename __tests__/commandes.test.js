@@ -1,14 +1,12 @@
 const request = require('supertest');
 const { faker } = require('@faker-js/faker');
 const app = require('../index');
-const sequelize = require('../config/database');
 const { Bars, Commande } = require('../models/models');
 
 describe('Commandes API', () => {
   let testBar;
 
   beforeAll(async () => {
-    await sequelize.sync({ force: true });
     testBar = await Bars.create({
       name: faker.company.name(),
       adresse: faker.location.streetAddress(),
@@ -16,9 +14,6 @@ describe('Commandes API', () => {
     });
   });
 
-  afterAll(async () => {
-    await sequelize.close();
-  });
 
   describe('POST /bars/:id_bar/commandes', () => {
     it('should create a new order for a bar', async () => {
@@ -30,9 +25,9 @@ describe('Commandes API', () => {
       };
 
       const response = await request(app)
-        .post(`/bars/${testBar.id}/commandes`)
-        .send(orderData)
-        .expect(201);
+          .post(`/bars/${testBar.id}/commandes`)
+          .send(orderData)
+          .expect(201);
 
       expect(response.body).toHaveProperty('message', 'Commande ajoutée avec succès au bar.');
     });
@@ -50,8 +45,8 @@ describe('Commandes API', () => {
       });
 
       const response = await request(app)
-        .get(`/bars/${testBar.id}/commandes`)
-        .expect(200);
+          .get(`/bars/${testBar.id}/commandes`)
+          .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
     });
@@ -69,8 +64,8 @@ describe('Commandes API', () => {
       });
 
       const response = await request(app)
-        .get(`/bars/${testBar.id}/commandes?date=${testDate}`)
-        .expect(200);
+          .get(`/bars/${testBar.id}/commandes?date=${testDate}`)
+          .expect(200);
 
       expect(response.body.length).toBeGreaterThanOrEqual(1);
     });
@@ -92,9 +87,9 @@ describe('Commandes API', () => {
       };
 
       const response = await request(app)
-        .put(`/commandes/${commande.id}`)
-        .send(updateData)
-        .expect(200);
+          .put(`/commandes/${commande.id}`)
+          .send(updateData)
+          .expect(200);
 
       expect(response.body).toHaveProperty('message', 'Commande mise à jour avec succès.');
     });
@@ -109,9 +104,9 @@ describe('Commandes API', () => {
       });
 
       await request(app)
-        .put(`/commandes/${commande.id}`)
-        .send({ name: 'Try to update' })
-        .expect(500); // Should fail as completed orders can't be modified
+          .put(`/commandes/${commande.id}`)
+          .send({ name: 'Try to update' })
+          .expect(500); // Should fail as completed orders can't be modified
     });
   });
 
@@ -126,8 +121,8 @@ describe('Commandes API', () => {
       });
 
       await request(app)
-        .delete(`/commandes/${commande.id}`)
-        .expect(200);
+          .delete(`/commandes/${commande.id}`)
+          .expect(200);
 
       // Verify the order is deleted
       const deletedOrder = await Commande.findByPk(commande.id);
