@@ -15,6 +15,10 @@ const JWT_SECRET = process.env.JWT_SECRET;
 exports.createBar = async (req, res) => {
     try {
         const { name, adresse, email, tel, description, password } = req.body;
+        const userId = req.user && req.user.userId;
+        if (!userId) {
+            return res.status(403).json({ message: 'Utilisateur non authentifié' });
+        }
 
         // Vérifie si l'email est déjà utilisé
         const existingBar = await Bars.findOne({ where: { email } });
@@ -33,6 +37,7 @@ exports.createBar = async (req, res) => {
             tel,
             description,
             password: hashedPassword,
+            userId
         });
 
         // Génération du token JWT (valable 2h)
@@ -48,7 +53,8 @@ exports.createBar = async (req, res) => {
             email: newBar.email,
             tel: newBar.tel,
             description: newBar.description,
-            token
+            token,
+            userId
         });
     } catch (error) {
         console.error('Erreur lors de la création du bar :', error);

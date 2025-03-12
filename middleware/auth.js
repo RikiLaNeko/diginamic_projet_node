@@ -18,7 +18,7 @@ const auth = (req, res, next) => {
     // Vérifie le token avec la clé secrète
     const decoded = jwt.verify(token, JWT_SECRET);
     // Optionnel : tu peux stocker les infos décodées dans req pour les utiliser plus tard
-    req.bar = decoded;
+    req.user = decoded;
     next();
   } catch (err) {
     return res.status(401).json({ message: "Token invalide" });

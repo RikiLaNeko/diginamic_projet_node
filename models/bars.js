@@ -37,7 +37,15 @@ const Bars = sequelize.define('Bars', {
     token: {
         type: DataTypes.STRING,
         allowNull: true
-    }    
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'Users', 
+            key: 'id'
+        }
+    }  
 
 }, {
     hooks: {
