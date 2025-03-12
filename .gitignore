@@ -6,4 +6,3 @@ database.sqlite
 
 # Normalement nous mettons les .env mais pour le bien du tp nous allons les mettre
 
-frontend/
