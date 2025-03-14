@@ -43,7 +43,7 @@ exports.register = async (req, res) => {
     // Génération d'un token JWT (valable 2 heures)
     const token = jwt.sign(
         { userId: newUser.id, email: newUser.email },
-        JWT_SECRET,  // Fixed this line - removed the curly braces
+        JWT_SECRET,
         { expiresIn: '2h' }
     );
 
@@ -68,7 +68,7 @@ exports.register = async (req, res) => {
  * Connexion d'un utilisateur
  *
  * Attendu dans req.body :
- *   - email: Email de l'utilisateur
+ *   - name: username de l'utilisateur
  *   - password: Mot de passe en clair
  *
  * Ce contrôleur vérifie les identifiants, et si l'utilisateur existe et que le
@@ -77,10 +77,10 @@ exports.register = async (req, res) => {
  */
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, password } = req.body;
 
-    // Recherche de l'utilisateur par email
-    const user = await User.findOne({ where: { email } });
+    // Recherche de l'utilisateur par name
+    const user = await User.findOne({ where: { name } });
     if (!user) {
       return res.status(400).json({ message: 'Identifiants invalides' });
     }

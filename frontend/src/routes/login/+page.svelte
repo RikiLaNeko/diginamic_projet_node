@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let email = '';
+	let name = '';
 	let password = '';
 	let rememberMe = false;
 	let loading = false;
@@ -19,7 +19,7 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ email, password, rememberMe })
+				body: JSON.stringify({ name, password, rememberMe })
 			});
 
 			const data = await response.json();
@@ -70,16 +70,16 @@
 
 	<form on:submit={handleSubmit} class="bg-gray-50 rounded-lg p-6 shadow-sm">
 		<div class="mb-4">
-			<label for="email" class="block text-gray-700 text-sm font-bold mb-2">
-				Email
+			<label for="username" class="block text-gray-700 text-sm font-bold mb-2">
+				Nom d'utilisateur
 			</label>
 			<input
-				type="email"
-				id="email"
-				bind:value={email}
+				type="text"
+				id="username"
+				bind:value={name}
 				required
 				class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-				placeholder="votre@email.com"
+				placeholder="votre nom d'utilisateur"
 			/>
 		</div>
 
