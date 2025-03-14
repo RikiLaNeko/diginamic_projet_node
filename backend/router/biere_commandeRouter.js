@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const biereCommandeController = require('../controllers/biere_commandeController');
+const biereCommandeController = require('../backend/controllers/biere_commandeController');
 
 router.get('/commandes/:id_commande/biere', biereCommandeController.getBieresFromCommande);
 

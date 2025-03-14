@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const biereController = require('../controllers/biereController');
+const biereController = require('../backend/controllers/biereController');
 
 // Modifier une bière
 // Endpoint : PUT /biere/:id_biere
