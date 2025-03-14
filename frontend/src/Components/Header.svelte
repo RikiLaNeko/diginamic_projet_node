@@ -78,7 +78,7 @@
 	{#if isMenuOpen}
 		<div class="md:hidden">
 			<div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-amber-800">
-				<a href="/" class="block px-3 py-2 rounded-md hover:bg-amber-700">Accueil</a>
+				<a href="/frontend/static" class="block px-3 py-2 rounded-md hover:bg-amber-700">Accueil</a>
 				<a href="/bars" class="block px-3 py-2 rounded-md hover:bg-amber-700">Bars</a>
 				<a href="/bieres" class="block px-3 py-2 rounded-md hover:bg-amber-700">Bières</a>
 
