@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const bcrypt = require('bcrypt');
 
 const User = sequelize.define('User', {
     id: {
@@ -14,7 +15,10 @@ const User = sequelize.define('User', {
     email: {
         type: DataTypes.STRING,
         unique: true,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            isEmail: true
+        }
     },
     password: {
         type: DataTypes.STRING,
@@ -26,10 +30,27 @@ const User = sequelize.define('User', {
     }
 }, {
     hooks: {
-        // Exemple : avant la suppression d'un utilisateur, sa gérer la suppression des bars associés
+        beforeCreate: async (user) => {
+            if (user.password) {
+                user.password = await bcrypt.hash(user.password, 10);
+            }
+        },
+        beforeUpdate: async (user) => {
+            if (user.changed('password')) {
+                user.password = await bcrypt.hash(user.password, 10);
+            }
+        },
         beforeDestroy: async (user) => {
+            // Get associated bars and delete them
+            const Bar = require('./bars');
+            await Bar.destroy({ where: { userId: user.id } });
         }
     }
 });
+
+// Instance method to check password
+User.prototype.validPassword = async function(password) {
+    return await bcrypt.compare(password, this.password);
+};
 
 module.exports = User;
