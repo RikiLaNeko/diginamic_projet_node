@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let firstName = '';
-	let lastName = '';
+	let username = '';
 	let email = '';
 	let password = '';
 	let confirmPassword = '';
@@ -13,13 +12,13 @@
 
 	const handleSubmit = async (e: Event) => {
 		e.preventDefault();
-		
+
 		// Vérification simple des mots de passe
 		if (password !== confirmPassword) {
 			error = 'Les mots de passe ne correspondent pas';
 			return;
 		}
-		
+
 		// Vérification des conditions
 		if (!acceptTerms) {
 			error = 'Veuillez accepter les conditions d\'utilisation';
@@ -35,10 +34,9 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ 
-					firstName, 
-					lastName, 
-					email, 
+				body: JSON.stringify({
+					name: username,
+					email,
 					password
 				})
 			});
@@ -50,12 +48,12 @@
 			}
 
 			successMessage = 'Inscription réussie ! Vous allez être redirigé vers la page de connexion.';
-			
+
 			// Rediriger vers la page de connexion après un court délai
 			setTimeout(() => {
 				window.location.href = '/login';
 			}, 2000);
-			
+
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Une erreur est survenue';
 		} finally {
@@ -85,34 +83,18 @@
 	{/if}
 
 	<form on:submit={handleSubmit} class="bg-gray-50 rounded-lg p-6 shadow-sm">
-		<div class="flex flex-col md:flex-row md:space-x-4">
-			<div class="mb-4 flex-1">
-				<label for="firstName" class="block text-gray-700 text-sm font-bold mb-2">
-					Prénom
-				</label>
-				<input
+		<div class="mb-4">
+			<label for="username" class="block text-gray-700 text-sm font-bold mb-2">
+				Nom d'utilisateur
+			</label>
+			<input
 					type="text"
-					id="firstName"
-					bind:value={firstName}
+					id="username"
+					bind:value={username}
 					required
 					class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-					placeholder="Jean"
-				/>
-			</div>
-			
-			<div class="mb-4 flex-1">
-				<label for="lastName" class="block text-gray-700 text-sm font-bold mb-2">
-					Nom
-				</label>
-				<input
-					type="text"
-					id="lastName"
-					bind:value={lastName}
-					required
-					class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-					placeholder="Dupont"
-				/>
-			</div>
+					placeholder="Votre nom d'utilisateur"
+			/>
 		</div>
 
 		<div class="mb-4">
@@ -120,12 +102,12 @@
 				Email
 			</label>
 			<input
-				type="email"
-				id="email"
-				bind:value={email}
-				required
-				class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-				placeholder="votre@email.com"
+					type="email"
+					id="email"
+					bind:value={email}
+					required
+					class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+					placeholder="votre@email.com"
 			/>
 		</div>
 
@@ -134,12 +116,12 @@
 				Mot de passe
 			</label>
 			<input
-				type="password"
-				id="password"
-				bind:value={password}
-				required
-				class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-				placeholder="••••••••"
+					type="password"
+					id="password"
+					bind:value={password}
+					required
+					class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+					placeholder="••••••••"
 			/>
 		</div>
 
@@ -148,22 +130,22 @@
 				Confirmer le mot de passe
 			</label>
 			<input
-				type="password"
-				id="confirmPassword"
-				bind:value={confirmPassword}
-				required
-				class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-				placeholder="••••••••"
+					type="password"
+					id="confirmPassword"
+					bind:value={confirmPassword}
+					required
+					class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+					placeholder="••••••••"
 			/>
 		</div>
 
 		<div class="mb-6 flex items-center">
 			<input
-				type="checkbox"
-				id="acceptTerms"
-				bind:checked={acceptTerms}
-				required
-				class="mr-2"
+					type="checkbox"
+					id="acceptTerms"
+					bind:checked={acceptTerms}
+					required
+					class="mr-2"
 			/>
 			<label for="acceptTerms" class="text-sm text-gray-700">
 				J'accepte les <a href="/terms" class="text-blue-500 hover:text-blue-800">conditions d'utilisation</a>
@@ -172,9 +154,9 @@
 
 		<div class="flex flex-col items-center">
 			<button
-				type="submit"
-				disabled={loading}
-				class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200 disabled:opacity-50"
+					type="submit"
+					disabled={loading}
+					class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200 disabled:opacity-50"
 			>
 				{loading ? 'Inscription en cours...' : 'S\'inscrire'}
 			</button>
@@ -182,7 +164,7 @@
 
 		<div class="mt-6 text-center pt-4 border-t border-gray-200">
 			<p class="text-sm text-gray-600">
-				Vous avez déjà un compte? 
+				Vous avez déjà un compte?
 				<a href="/login" class="font-bold text-blue-500 hover:text-blue-800">
 					Se connecter
 				</a>
