@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const barsController = require('../backend/controllers/barsController');
-const biereController = require('../backend/controllers/biereController');
-const commandeController = require('../backend/controllers/commandeController');
-const auth = require('../backend/middleware/auth');
+const barsController = require('../controllers/barsController');
+const biereController = require('../controllers/biereController');
+const commandeController = require('../controllers/commandeController');
+const auth = require('../middleware/auth');
 
 // GET /bars => Liste des bars
 router.get('/', barsController.getAllBars);

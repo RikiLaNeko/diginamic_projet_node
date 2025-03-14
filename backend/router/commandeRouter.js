@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const commandesController = require('../backend/controllers/commandeController');
-const { validateCommande } = require('../backend/middleware/form');
+const commandesController = require('../controllers/commandeController');
+const { validateCommande } = require('../middleware/form');
 
 // GET /commandes/:id => Détail d'une commande
 router.get('/:id', commandesController.getCommandeById);
