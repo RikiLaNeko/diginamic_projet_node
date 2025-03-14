@@ -10,8 +10,9 @@
     let successMessage: string | null = null;
     let isAuthenticated = false;
 
+
     onMount(() => {
-        
+        // Check authentication on page load
         const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
         isAuthenticated = !!token;
     });
@@ -27,7 +28,7 @@
                 throw new Error('Vous devez être connecté pour ajouter un bar');
             }
 
-            
+
             const response = await fetch('http://localhost:3000/bars', {
                 method: 'POST',
                 headers: {
@@ -92,7 +93,7 @@
 
     {#if isAuthenticated}
         <form on:submit={handleSubmit} class="bg-gray-50 rounded-lg p-6 shadow-sm">
-            
+
             <div class="mb-4">
                 <label for="name" class="block text-gray-700 text-sm font-bold mb-2">
                     Nom

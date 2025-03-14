@@ -46,7 +46,7 @@
                 return;
             }
 
-            const response = await fetch('http://localhost:3000/beers', {
+            const response = await fetch('http://localhost:3000/biere', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -83,7 +83,7 @@
                 description: description || undefined
             };
 
-            const response = await fetch('http://localhost:3000/beers', {
+            const response = await fetch('http://localhost:3000/biere', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -126,7 +126,7 @@
                 throw new Error('Vous devez être connecté pour supprimer une bière');
             }
 
-            const response = await fetch(`http://localhost:3000/beers/${id}`, {
+            const response = await fetch(`http://localhost:3000/biere/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`

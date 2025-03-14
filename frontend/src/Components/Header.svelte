@@ -14,16 +14,16 @@
 
 	// Check if user is logged in on mount
 	onMount(() => {
-		const token = localStorage.getItem('token');
+		const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
 		if (token) {
-			// You could fetch user info here if needed
 			user.set({ token });
 		}
 	});
 
 	// Logout function
 	function logout() {
-		localStorage.removeItem('token');
+		localStorage.removeItem('authToken');
+		sessionStorage.removeItem('authToken');
 		user.set(null);
 	}
 </script>

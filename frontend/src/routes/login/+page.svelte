@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+
+	import {onMount} from "svelte";
 
 	let name = '';
 	let password = '';
@@ -7,6 +8,14 @@
 	let loading = false;
 	let error: string | null = null;
 	let successMessage: string | null = null;
+
+	let isAuthenticated = false;
+
+	onMount(() => {
+		// Check authentication on page load
+		const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+		isAuthenticated = !!token;
+	});
 
 	const handleSubmit = async (e: Event) => {
 		e.preventDefault();
@@ -34,12 +43,12 @@
 			storage.setItem('user', JSON.stringify(data.user));
 
 			successMessage = 'Connexion réussie!';
-			
+
 			// Rediriger vers la page d'accueil après un court délai
 			setTimeout(() => {
 				window.location.href = '/';
 			}, 1000);
-			
+
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Une erreur est survenue';
 		} finally {
@@ -117,7 +126,7 @@
 			>
 				{loading ? 'Connexion en cours...' : 'Se connecter'}
 			</button>
-			
+
 			<a href="/forgot-password" class="text-sm text-blue-500 hover:text-blue-800">
 				Mot de passe oublié?
 			</a>
@@ -125,7 +134,7 @@
 
 		<div class="mt-6 text-center pt-4 border-t border-gray-200">
 			<p class="text-sm text-gray-600">
-				Pas encore de compte? 
+				Pas encore de compte?
 				<a href="/register" class="font-bold text-blue-500 hover:text-blue-800">
 					S'inscrire
 				</a>
