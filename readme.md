@@ -1,4 +1,4 @@
-# BAR API BY MABUSO PIERRE, KHLFI WISSEM, CHLOE MORTREUX
+# BAR API BY MABUSO PIERRE, KHLIFI WISSEM, CHLOE MORTREUX
 
 A comprehensive RESTful API for bar management, including beer inventory and order processing.
 
@@ -77,6 +77,6 @@ Authorization: Bearer <your_token>
 # Contributors
 MABUSO Pierre
 
-KHLFI Wissem
+KHLIFI Wissem
 
 MORTREUX Chloe

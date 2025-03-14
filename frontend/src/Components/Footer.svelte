@@ -4,7 +4,7 @@
     const currentYear = new Date().getFullYear();
     const contributors = [
         "MABUSO Pierre",
-        "KHLFI Wissem",
+        "KHLIFI Wissem",
         "MORTREUX Chloe"
     ];
 
