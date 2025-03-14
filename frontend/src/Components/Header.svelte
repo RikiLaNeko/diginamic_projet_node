@@ -2,8 +2,11 @@
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 
-	// Store for authentication state
-	const user = writable(null);
+	// Define a type for user
+	type User = { token: string } | null;
+
+	// Store for authentication state with proper typing
+	const user = writable<User>(null);
 
 	// Toggle mobile menu
 	let isMenuOpen = false;

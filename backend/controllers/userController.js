@@ -1,5 +1,4 @@
 const { User } = require('../models/models');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
@@ -10,15 +9,6 @@ if (!process.env.JWT_SECRET) {
 
 /**
  * Inscription d'un utilisateur
- *
- * Attendu dans req.body :
- *   - name: Nom de l'utilisateur
- *   - email: Email
- *   - password: Mot de passe en clair
- *
- * Ce contrôleur vérifie l'unicité de l'email, hash le mot de passe,
- * crée l'utilisateur et génère un token JWT valide pendant 2 heures.
- * La réponse renvoie l'ID, le nom, l'email et le token de l'utilisateur.
  */
 exports.register = async (req, res) => {
   try {
@@ -30,14 +20,12 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'Email déjà utilisé' });
     }
 
-    // Hash du mot de passe avec un salt de 10
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     // Création de l'utilisateur dans la base de données
+    // Le hook beforeCreate va automatiquement hasher le mot de passe
     const newUser = await User.create({
       name,
       email,
-      password: hashedPassword
+      password
     });
 
     // Génération d'un token JWT (valable 2 heures)
@@ -47,11 +35,10 @@ exports.register = async (req, res) => {
         { expiresIn: '2h' }
     );
 
-    // Stockage du token dans l'utilisateur (optionnel)
+    // Stockage du token dans l'utilisateur
     newUser.token = token;
     await newUser.save();
 
-    // Réponse sans renvoyer le mot de passe
     return res.status(201).json({
       id: newUser.id,
       name: newUser.name,
@@ -66,14 +53,6 @@ exports.register = async (req, res) => {
 
 /**
  * Connexion d'un utilisateur
- *
- * Attendu dans req.body :
- *   - name: username de l'utilisateur
- *   - password: Mot de passe en clair
- *
- * Ce contrôleur vérifie les identifiants, et si l'utilisateur existe et que le
- * mot de passe est correct, il génère un nouveau token JWT valide pendant 2 heures.
- * La réponse renvoie l'ID, le nom, l'email et le token de l'utilisateur.
  */
 exports.login = async (req, res) => {
   try {
@@ -85,8 +64,8 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Identifiants invalides' });
     }
 
-    // Vérification du mot de passe
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Utilisation de la méthode d'instance pour vérifier le mot de passe
+    const isMatch = await user.validPassword(password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Identifiants invalides' });
     }
