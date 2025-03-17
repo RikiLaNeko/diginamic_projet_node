@@ -14,44 +14,36 @@ const Bars = sequelize.define('Bars', {
         unique: true,
         allowNull: false
     },
-    adresse: {
+    addresse: {
         type: DataTypes.STRING,
         allowNull: false
     },
     tel: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: true
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     description: {
         type: DataTypes.TEXT,
-        allowNull: true
-    },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    token: {
-        type: DataTypes.STRING,
         allowNull: true
     },
     userId: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-            model: 'Users', 
+            model: 'Users',
             key: 'id'
         }
-    }  
-
+    }
 }, {
     hooks: {
-        beforeDestroy: async (bar) => {
-            await Biere.destroy({ where: { bars_id: bar.id } });
-            await Commande.destroy({ where: { bars_id: bar.id } });
+        beforeDestroy: async (bar, options) => {
+            await Biere.destroy({ where: { bars_id: bar.id }, individualHooks: true });
+            await Commande.destroy({ where: { bars_id: bar.id }, individualHooks: true });
         }
     }
 });

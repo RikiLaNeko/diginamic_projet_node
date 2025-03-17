@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     let name = '';
-    let address = '';
-    let phone = '';
+    let addresse = '';
+    let tel = '';
     let email = '';
     let description = '';
     let loading = false;
@@ -37,8 +37,8 @@
                 },
                 body: JSON.stringify({
                     name,
-                    address,
-                    phone,
+                    addresse,
+                    tel,
                     email,
                     description
                 })
@@ -53,8 +53,8 @@
 
             // Réinitialiser le formulaire
             name = '';
-            address = '';
-            phone = '';
+            addresse = '';
+            tel = '';
             email = '';
             description = '';
 
@@ -115,7 +115,7 @@
                 <input
                         type="text"
                         id="address"
-                        bind:value={address}
+                        bind:value={addresse}
                         required
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         placeholder="123 rue Example, Ville"
@@ -123,13 +123,13 @@
             </div>
 
             <div class="mb-4">
-                <label for="phone" class="block text-gray-700 text-sm font-bold mb-2">
+                <label for="tel" class="block text-gray-700 text-sm font-bold mb-2">
                     Téléphone
                 </label>
                 <input
                         type="tel"
-                        id="phone"
-                        bind:value={phone}
+                        id="tel"
+                        bind:value={tel}
                         required
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         placeholder="01 23 45 67 89"

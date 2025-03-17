@@ -13,6 +13,7 @@ app.use(bodyParser.json());
 app.use('/', routers);
 
 
+
 if (process.env.NODE_ENV !== 'test') {
     sequelize.sync({ force: false }).then(() => {
         console.info('Base de donnée et table crée!');

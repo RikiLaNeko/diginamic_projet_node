@@ -21,7 +21,6 @@
 	});
 </script>
 
-
 <svelte:head>
 	<title>Liste des Bars</title>
 	<meta name="description" content="Découvrez notre sélection de bars" />

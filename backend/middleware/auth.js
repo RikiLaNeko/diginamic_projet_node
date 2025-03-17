@@ -1,26 +1,23 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET; 
+const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
 const auth = (req, res, next) => {
-  // Récupère le token dans le header "Authorization"
   const authHeader = req.headers["authorization"];
+
   if (!authHeader) {
+    console.warn("⚠️ Aucun token fourni dans les headers");
     return res.status(403).json({ message: "Un token est requis pour accéder à cette ressource" });
   }
 
-  // Si le token est de la forme "Bearer <token>", on enlève "Bearer "
-  let token = authHeader;
-  if (token.startsWith("Bearer ")) {
-    token = token.slice(7, token.length);
-  }
+  // Vérification du format "Bearer <token>"
+  let token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
 
   try {
-    // Vérifie le token avec la clé secrète
     const decoded = jwt.verify(token, JWT_SECRET);
-    // Optionnel : tu peux stocker les infos décodées dans req pour les utiliser plus tard
     req.user = decoded;
     next();
   } catch (err) {
+    console.error("❌ Token invalide:", err.message);
     return res.status(401).json({ message: "Token invalide" });
   }
 };

@@ -21,30 +21,16 @@ exports.register = async (req, res) => {
     }
 
     // Création de l'utilisateur dans la base de données
-    // Le hook beforeCreate va automatiquement hasher le mot de passe
-    const newUser = await User.create({
-      name,
-      email,
-      password
-    });
+    const newUser = await User.create({ name, email, password });
 
-    // Génération d'un token JWT (valable 2 heures)
-    const token = jwt.sign(
-        { userId: newUser.id, email: newUser.email },
-        JWT_SECRET,
-        { expiresIn: '2h' }
-    );
+    // Génération du token JWT (valable 2 heures)
+    const token = jwt.sign({ userId: newUser.id, email: newUser.email }, JWT_SECRET, { expiresIn: '2h' });
 
-    // Stockage du token dans l'utilisateur
+    // Stockage du token
     newUser.token = token;
     await newUser.save();
 
-    return res.status(201).json({
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      token: newUser.token
-    });
+    return res.status(201).json({ id: newUser.id, name: newUser.name, email: newUser.email, token });
   } catch (err) {
     console.error('Erreur lors de l\'inscription:', err);
     return res.status(500).json({ message: 'Erreur lors de l\'inscription' });
@@ -64,29 +50,20 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Identifiants invalides' });
     }
 
-    // Utilisation de la méthode d'instance pour vérifier le mot de passe
+    // Vérification du mot de passe
     const isMatch = await user.validPassword(password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Identifiants invalides' });
     }
 
-    // Génération d'un nouveau token JWT (valable 2 heures)
-    const token = jwt.sign(
-        { userId: user.id, email: user.email },
-        JWT_SECRET,
-        { expiresIn: '2h' }
-    );
+    // Génération d'un NOUVEAU token JWT à chaque connexion
+    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '2h' });
 
-    // Mise à jour du token dans la base
+    // Mise à jour du token dans la base de données
     user.token = token;
     await user.save();
 
-    return res.status(200).json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      token: user.token
-    });
+    return res.status(200).json({ id: user.id, name: user.name, email: user.email, token });
   } catch (err) {
     console.error('Erreur lors de la connexion:', err);
     return res.status(500).json({ message: 'Erreur lors de la connexion' });
