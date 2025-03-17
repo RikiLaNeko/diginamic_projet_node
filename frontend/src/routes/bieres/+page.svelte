@@ -3,8 +3,8 @@
 
     // Formulaire d'ajout de bière
     let name = '';
-    let alcoholContent = '';
-    let price = '';
+    let degree = '';
+    let prix = '';
     let description = '';
     let loading = false;
     let error: string | null = null;
@@ -14,8 +14,8 @@
     type Beer = {
         id: string;
         name: string;
-        alcoholContent: number;
-        price: number;
+        degree: number;
+        prix: number;
         description?: string;
     };
     
@@ -46,7 +46,7 @@
                 return;
             }
 
-            const response = await fetch('http://localhost:3000/biere', {
+            const response = await fetch('http://localhost:3000/biere/', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -78,8 +78,8 @@
 
             const beerData = {
                 name,
-                alcoholContent: parseFloat(alcoholContent),
-                price: parseFloat(price),
+                degree: parseFloat(degree),
+                prix: parseFloat(prix),
                 description: description || undefined
             };
 
@@ -101,8 +101,8 @@
             
             // Réinitialiser le formulaire
             name = '';
-            alcoholContent = '';
-            price = '';
+            degree = '';
+            prix = '';
             description = '';
             
             // Actualiser la liste
@@ -169,18 +169,18 @@
         
         // Filtres de prix
         if (minPrice) {
-            filteredBeers = filteredBeers.filter(beer => beer.price >= parseFloat(minPrice));
+            filteredBeers = filteredBeers.filter(beer => beer.prix >= parseFloat(minPrice));
         }
         if (maxPrice) {
-            filteredBeers = filteredBeers.filter(beer => beer.price <= parseFloat(maxPrice));
+            filteredBeers = filteredBeers.filter(beer => beer.prix <= parseFloat(maxPrice));
         }
         
         // Filtres d'alcool
         if (minAlcohol) {
-            filteredBeers = filteredBeers.filter(beer => beer.alcoholContent >= parseFloat(minAlcohol));
+            filteredBeers = filteredBeers.filter(beer => beer.degree >= parseFloat(minAlcohol));
         }
         if (maxAlcohol) {
-            filteredBeers = filteredBeers.filter(beer => beer.alcoholContent <= parseFloat(maxAlcohol));
+            filteredBeers = filteredBeers.filter(beer => beer.degree <= parseFloat(maxAlcohol));
         }
         
         // Tri par nom
@@ -269,7 +269,7 @@
             <input
                 type="number"
                 id="alcoholContent"
-                bind:value={alcoholContent}
+                bind:value={degree}
                 min="0"
                 step="0.1"
                 required
@@ -285,7 +285,7 @@
             <input
                 type="number"
                 id="price"
-                bind:value={price}
+                bind:value={prix}
                 min="0"
                 step="0.01"
                 required
@@ -413,8 +413,8 @@
                     <div class="border p-4 rounded flex flex-col md:flex-row md:items-center justify-between">
                         <div>
                             <p class="font-bold">{beer.name}</p>
-                            <p>Degré d'alcool: {beer.alcoholContent}%</p>
-                            <p>Prix: {beer.price}€</p>
+                            <p>Degré d'alcool: {beer.degree}%</p>
+                            <p>Prix: {beer.prix}€</p>
                             {#if beer.description}
                                 <p>Description: {beer.description}</p>
                             {/if}

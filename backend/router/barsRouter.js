@@ -26,10 +26,10 @@ router.delete('/:id_bar', auth , barsController.deleteBar);
 // Toutes les routes liées au degré d'alcool
 router.get('/:id_bar/degree', barsController.getAverageAlcoholDegree);
 
-// POST /bars/:id_bar/biere => Ajouter une bière à un bar
+// POST /bars/:id_bar/bieres => Ajouter une bière à un bar
 router.post('/:id_bar/biere', auth , biereController.addBiereToBar);
 
-// GET /bars/:id_bar/biere => Liste des bières d'un bar (avec tous les filtres)
+// GET /bars/:id_bar/bieres => Liste des bières d'un bar (avec tous les filtres)
 router.get('/:id_bar/biere', biereController.getBiereListByBar);
 
 // POST /bars/:id_bar/commandes => Ajouter une commande

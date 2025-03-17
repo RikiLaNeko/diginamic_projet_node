@@ -4,11 +4,11 @@
  * Ce contrôleur gère toutes les opérations CRUD liées aux bières.
  * 
  * Endpoints gérés :
- *  - POST /bars/:id_bar/biere   => Ajouter une bière à un bar
- *  - PUT /biere/:id_biere       => Modifier une bière
- *  - DELETE /biere/:id_biere    => Supprimer une bière d'un bar
- *  - GET /bars/:id_bar/biere    => Liste des bières d'un bar
- *  - GET /biere/:id_biere       => Détail d'une bière
+ *  - POST /bars/:id_bar/bieres   => Ajouter une bière à un bar
+ *  - PUT /bieres/:id_biere       => Modifier une bière
+ *  - DELETE /bieres/:id_biere    => Supprimer une bière d'un bar
+ *  - GET /bars/:id_bar/bieres    => Liste des bières d'un bar
+ *  - GET /bieres/:id_biere       => Détail d'une bière
  */
 
 const { Op } = require('sequelize');
@@ -125,11 +125,11 @@ exports.deleteBiere = async (req, res) => {
  * (version enrichie pour gérer le tri, la pagination et les filtres sur le degré/prix)
  * 
  * Endpoints avancés :
- *  - GET /bars/:id_bar/biere?sort=desc
- *  - GET /bars/:id_bar/biere?sort=asc&limit=10
- *  - GET /bars/:id_bar/biere?sort=asc&limit=10&offset=5
- *  - GET /bars/:id_bar/biere?sort=asc&limit=10&offset=5&degree_min=5&degree_max=10
- *  - GET /bars/:id_bar/biere?sort=asc&limit=10&offset=5&degree_min=5&degree_max=10&prix_min=10&prix_max=20
+ *  - GET /bars/:id_bar/bieres?sort=desc
+ *  - GET /bars/:id_bar/bieres?sort=asc&limit=10
+ *  - GET /bars/:id_bar/bieres?sort=asc&limit=10&offset=5
+ *  - GET /bars/:id_bar/bieres?sort=asc&limit=10&offset=5&degree_min=5&degree_max=10
+ *  - GET /bars/:id_bar/bieres?sort=asc&limit=10&offset=5&degree_min=5&degree_max=10&prix_min=10&prix_max=20
  *
  * @param {Object} req - Objet requête Express
  *   - params.id_bar : l'ID du bar
@@ -198,7 +198,7 @@ exports.getBiereListByBar = async (req, res) => {
 
 /**
  * Récupérer le détail d'une bière
- * GET /biere/:id_biere
+ * GET /bieres/:id_biere
  * 
  * @param {Object} req - Objet requête Express
  * @param {Object} res - Objet réponse Express
@@ -219,6 +219,127 @@ exports.getBiereById = async (req, res) => {
     console.error('Erreur lors de la récupération de la bière :', error);
     return res.status(500).json({
       message: 'Une erreur est survenue lors de la récupération de la bière.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Ajouter une nouvelle bière
+ * Endpoint: POST /bieres
+ *
+ * @param {Object} req - Objet requête Express
+ * @param {Object} res - Objet réponse Express
+ * @returns {Object} - Retourne la bière créée
+ */
+exports.createBiere = async (req, res) => {
+  try {
+    const { name, description, degree, prix, bars_id } = req.body;
+
+    // Vérification des champs obligatoires
+    if (!name || degree === undefined || prix === undefined) {
+      return res.status(400).json({ message: 'Les champs name, degree et prix sont obligatoires.' });
+    }
+
+    // Si un ID de bar est fourni, vérifier qu'il existe
+    if (bars_id) {
+      const bar = await Bars.findByPk(bars_id);
+      if (!bar) {
+        return res.status(404).json({ message: 'Bar introuvable.' });
+      }
+    }
+
+    // Créer une nouvelle bière
+    const newBiere = await Biere.create({
+      name,
+      description,
+      degree,
+      prix,
+      bars_id
+    });
+
+    return res.status(201).json({
+      message: 'Bière créée avec succès.',
+      biere: newBiere,
+    });
+  } catch (error) {
+    console.error('Erreur lors de la création de la bière :', error);
+    return res.status(500).json({
+      message: 'Une erreur est survenue lors de la création de la bière.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Récupérer toutes les bières
+ * Endpoint: GET /bieres
+ *
+ * Supporte les paramètres de requête:
+ * - sort: "asc" ou "desc" (tri par nom)
+ * - limit: nombre d'éléments à retourner
+ * - offset: nombre d'éléments à sauter
+ * - degree_min, degree_max: filtres sur le degré d'alcool
+ * - prix_min, prix_max: filtres sur le prix
+ * - bars_id: filtre par bar
+ *
+ * @param {Object} req - Objet requête Express
+ * @param {Object} res - Objet réponse Express
+ * @returns {Array} - Retourne la liste des bières
+ */
+exports.getAllBieres = async (req, res) => {
+  try {
+    const { sort, limit, offset, degree_min, degree_max, prix_min, prix_max, bars_id } = req.query;
+
+    // Construire la clause WHERE
+    const whereClause = {};
+
+    // Filtre par bar si spécifié
+    if (bars_id !== undefined) {
+      whereClause.bars_id = bars_id;
+    }
+
+    // Filtre sur le degré d'alcool
+    if (degree_min !== undefined && degree_max !== undefined) {
+      whereClause.degree = { [Op.between]: [parseFloat(degree_min), parseFloat(degree_max)] };
+    } else if (degree_min !== undefined) {
+      whereClause.degree = { [Op.gte]: parseFloat(degree_min) };
+    } else if (degree_max !== undefined) {
+      whereClause.degree = { [Op.lte]: parseFloat(degree_max) };
+    }
+
+    // Filtre sur le prix
+    if (prix_min !== undefined && prix_max !== undefined) {
+      whereClause.prix = { [Op.between]: [parseFloat(prix_min), parseFloat(prix_max)] };
+    } else if (prix_min !== undefined) {
+      whereClause.prix = { [Op.gte]: parseFloat(prix_min) };
+    } else if (prix_max !== undefined) {
+      whereClause.prix = { [Op.lte]: parseFloat(prix_max) };
+    }
+
+    // Tri par nom
+    const orderClause = [['name', (sort && sort.toLowerCase() === 'desc') ? 'DESC' : 'ASC']];
+
+    // Construction des options
+    const options = {
+      where: whereClause,
+      order: orderClause
+    };
+
+    if (limit !== undefined) {
+      options.limit = parseInt(limit, 10);
+    }
+    if (offset !== undefined) {
+      options.offset = parseInt(offset, 10);
+    }
+
+    // Récupérer toutes les bières
+    const bieres = await Biere.findAll(options);
+    return res.status(200).json(bieres);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des bières :', error);
+    return res.status(500).json({
+      message: 'Une erreur est survenue lors de la récupération des bières.',
       error: error.message,
     });
   }

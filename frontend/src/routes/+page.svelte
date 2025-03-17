@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Bar } from '../types/interfaces';
+	import { goto } from '$app/navigation';
+
+	function navigateToBarDetail(barId:any) {
+		goto(`/bars/${barId}`);
+	}
 
 	let bars: Bar[] = [];
 	let loading = true;
@@ -38,7 +43,7 @@
 	{:else}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 			{#each bars as bar}
-				<div class="bg-amber-100 rounded-md p-6 shadow-md hover:bg-amber-200 transition-all duration-200 border border-amber-300">
+				<div class="bg-amber-100 rounded-md p-6 shadow-md hover:bg-amber-200 transition-all duration-200 border border-amber-300" on:click={() => navigateToBarDetail(bar.id)}>
 					<h2 class="mt-0 mb-4 text-amber-800 font-semibold text-xl">{bar.name}</h2>
 					<p class="mb-2 text-amber-900"><strong>Adresse:</strong> {bar.adresse}</p>
 					{#if bar.tel}

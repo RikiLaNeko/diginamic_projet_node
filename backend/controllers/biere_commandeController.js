@@ -5,8 +5,8 @@
  * via la table pivot BiereCommande.
  *
  * Endpoints :
- *   - POST /commandes/:id_commande/biere/:id_biere  => addBiereToCommande
- *   - DELETE /commandes/:id_commande/biere/:id_biere => deleteBiereFromCommande
+ *   - POST /commandes/:id_commande/bieres/:id_biere  => addBiereToCommande
+ *   - DELETE /commandes/:id_commande/bieres/:id_biere => deleteBiereFromCommande
  *
  * Contraintes :
  *   - La commande et la bière doivent exister.
@@ -17,7 +17,7 @@ const { Commande, Biere, BiereCommande } = require('../models/models');
 
 /**
  * Récupérer toutes les bières d'une commande.
- * GET /commandes/:id_commande/biere
+ * GET /commandes/:id_commande/bieres
  *
  * @param {Object} req - Requête Express.
  * @param {Object} res - Réponse Express.
@@ -61,7 +61,7 @@ exports.getBieresFromCommande = async (req, res) => {
 
 /**
  * Ajouter une bière à une commande.
- * POST /commandes/:id_commande/biere/:id_biere
+ * POST /commandes/:id_commande/bieres/:id_biere
  *
  * @param {Object} req - Requête Express.
  * @param {Object} res - Réponse Express.
@@ -107,7 +107,7 @@ exports.addBiereToCommande = async (req, res) => {
 
 /**
  * Supprimer une bière d'une commande.
- * DELETE /commandes/:id_commande/biere/:id_biere
+ * DELETE /commandes/:id_commande/bieres/:id_biere
  *
  * @param {Object} req - Requête Express.
  * @param {Object} res - Réponse Express.
