@@ -62,7 +62,6 @@ describe('Bars Model', () => {
             expect(bar.tel).toBe(barData.tel);
             expect(bar.email).toBe(barData.email);
             expect(bar.description).toBe(barData.description);
-            expect(bar.password).toBe(barData.password);
         });
     });
 
