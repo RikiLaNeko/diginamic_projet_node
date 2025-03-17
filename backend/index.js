@@ -10,7 +10,15 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+/*
+Ici nous utilisons CORS pour autoriser les requêtes provenant de n'importe quelle origine uniquement en développement
+Dans un environnement de production, il est recommandé de spécifier les origines autorisées en fonction de votre configuration.
+ */
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(bodyParser.json());
 app.use('/', routers);
